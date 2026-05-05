@@ -46,4 +46,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //implementations for https-requests
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }
