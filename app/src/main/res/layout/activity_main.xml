@@ -42,7 +42,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/sun"
+                android:src="@drawable/clear"
                 />
             <TextView
                 android:id="@+id/current_temperature"
@@ -66,6 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_below="@id/frame_layout"/>
+        android:layout_below="@id/frame_layout"
+        android:orientation="vertical"/>
 
 </RelativeLayout>
