@@ -25,6 +25,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentTemperatureView: TextView
     private lateinit var currentWeatherView: TextView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val days: MutableList<Day> = mutableListOf()
+
 
     private var adapter: DaysListAdapter? = null
     var recyclerView: RecyclerView? = null
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         adapter = DaysListAdapter(this,days.slice(1 until days.size), object :
             DaysListAdapter.OnClickListener {
             override fun onClick(day: Day, position: Int) {
-                onClick(day)
+                onClick(position)
             }
         })
 
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                     setCurrentWeatherData()
                     adapter = DaysListAdapter(this, days.slice(1 until days.size),object : DaysListAdapter.OnClickListener {
                         override fun onClick(day: Day, position: Int) {
-                            Toast.makeText(this@MainActivity, "Clicked: $position", Toast.LENGTH_SHORT).show()
+                            onClick(position)
                         }
                     })
                     recyclerView!!.setAdapter(adapter)
@@ -191,12 +192,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun onClick(day: Day) {
-        Toast.makeText(this, "tap on $day", Toast.LENGTH_SHORT).show()
+    private fun onClick(index: Int) {
+        val intent = Intent(this, DayActivity::class.java)
+        intent.putExtra("index", index+3)
+        startActivity(intent)
     }
 
     companion object {
         const val API_KEY = "8c195f5286cded5d2d2d91cf76330fbb"
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
+        val days: MutableList<Day> = mutableListOf()
     }
 }
