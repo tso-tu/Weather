@@ -1,15 +1,17 @@
 package com.example.weather.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.R
 import com.example.weather.dataclasses.Hour
 
-class HoursListAdapter(private val list: List<Hour>) : RecyclerView.Adapter<HoursListAdapter.ViewHolder>() {
+class HoursListAdapter(private val context: Context, private val list: List<Hour>) : RecyclerView.Adapter<HoursListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.hours_element, parent, false)
@@ -21,7 +23,15 @@ class HoursListAdapter(private val list: List<Hour>) : RecyclerView.Adapter<Hour
         val hour = list[position]
         holder.hourView.text = hour.hour
         holder.temperatureView.text = hour.temperature.toString()
-
+        val weather = hour.weather
+        val weatherImage = when (weather) {
+            "Clear" -> R.drawable.clear
+            "Clouds" -> R.drawable.cloudy
+            "Rain" -> R.drawable.rain
+            "Thunderstorm" -> R.drawable.thunder
+            else -> null
+        }
+        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage!!))
     }
 
     override fun getItemCount(): Int {
@@ -30,7 +40,7 @@ class HoursListAdapter(private val list: List<Hour>) : RecyclerView.Adapter<Hour
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val hourView: TextView = itemView.findViewById(R.id.hour)
-        //val imageView: ImageView = itemView.findViewById(R.id.imageview)
+        val imageView: ImageView = itemView.findViewById(R.id.weather_img)
         val temperatureView : TextView = itemView.findViewById(R.id.temperature)
 
     }

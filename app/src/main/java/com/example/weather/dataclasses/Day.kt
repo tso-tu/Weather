@@ -8,6 +8,8 @@ data class Day (
     val hours_list: List<Hour>,
     val mean_temperature: Int,
     val mean_feels_like: Int,
-    val mean_weather: String
+    val mean_weather: String,
+    val dawn: Long,
+    val dusk: Long
 ): Serializable
 

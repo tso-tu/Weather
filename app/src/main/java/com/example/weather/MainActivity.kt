@@ -6,11 +6,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,11 +30,14 @@ import org.json.JSONObject
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var currentDateView: TextView
     private lateinit var currentTemperatureView: TextView
     private lateinit var currentWeatherView: TextView
+    private lateinit var currentWeatherImageView: ImageView
+    private lateinit var backgroundImageView: ImageView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
@@ -44,13 +49,20 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val formater = SimpleDateFormat("d MMMM, EE")
+        val formater = SimpleDateFormat("d MMMM, EE", Locale("ru"))
         val currentDate = formater.format(Date())
 
         currentDateView = findViewById(R.id.current_date)
         currentDateView.text = currentDate
         currentTemperatureView = findViewById(R.id.current_temperature)
         currentWeatherView = findViewById(R.id.current_weather)
+        currentWeatherImageView = findViewById(R.id.weather)
+
+        backgroundImageView = findViewById(R.id.background) as ImageView
+        backgroundImageView.setOnClickListener {
+            val intent = Intent(this, DayActivity::class.java)
+            startActivity(intent)
+        }
 
 
         recyclerView = findViewById(R.id.days)
@@ -114,6 +126,9 @@ class MainActivity : AppCompatActivity() {
                     val jsonResponse = JSONObject(response)
                     val list = jsonResponse.getJSONArray("list")
 
+                    val dawn = jsonResponse.getJSONObject("city").getLong("sunrise")
+                    val dusk = jsonResponse.getJSONObject("city").getLong("sunset")
+
                     var current_date = list.getJSONObject(0).getString("dt_txt").split("\\s+".toRegex())[0]
 
                     val hours_list : MutableList<Hour> = mutableListOf()
@@ -130,15 +145,15 @@ class MainActivity : AppCompatActivity() {
 
                             var precipitation = 0
                             try {
-                                precipitation = list.getJSONObject(i).getJSONObject("rain").getInt("1h")
+                                precipitation = list.getJSONObject(i).getJSONObject("rain").optInt("1h", list.getJSONObject(i).getJSONObject("rain").optInt("3h", 0))
                             } catch (e: JSONException) {
                                 println("Осадков нет")
                             }
-                            hours_list.add(Hour(list.getJSONObject(i).getString("dt_txt").split("\\s+".toRegex())[1], weather, temperature, feels_like, wind, humidity, precipitation))
+                            hours_list.add(Hour(list.getJSONObject(i).getString("dt_txt").split("\\s+".toRegex())[1].slice(0 until 5), weather, temperature, feels_like, wind, humidity, precipitation))
                         }
                         else {
                             val inputFormat = SimpleDateFormat("yyyy-MM-dd")
-                            val outputFormat = SimpleDateFormat("EE")
+                            val outputFormat = SimpleDateFormat("EE", Locale("ru"))
                             val day_of_week = outputFormat.format(inputFormat.parse(current_date))
 
                             var mean_temperature = 0
@@ -158,9 +173,8 @@ class MainActivity : AppCompatActivity() {
                             }
                             val mean_weather = weather_list.groupingBy { it }.eachCount().maxBy { it.value }.key
 
-                            days.add(Day(current_date, day_of_week, hours_list, mean_temperature, mean_feels_like, mean_weather))
+                            days.add(Day(current_date, day_of_week, hours_list.toList(), mean_temperature, mean_feels_like, mean_weather, dawn, dusk))
                             current_date = list.getJSONObject(i).getString("dt_txt").split("\\s+".toRegex())[0]
-                            println(hours_list)
                             hours_list.clear()
                         }
                     }
@@ -190,11 +204,40 @@ class MainActivity : AppCompatActivity() {
         currentTemperatureView.text = "$temperature°C"
         currentWeatherView.text = "$weather, ощущается как $feels_like"
 
+        val weatherImage = when (weather) {
+            "Clear" -> R.drawable.clear
+            "Clouds" -> R.drawable.cloudy
+            "Rain" -> R.drawable.rain
+            "Thunderstorm" -> R.drawable.thunder
+            else -> null
+        }
+        currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage!!))
+
+        val currentTime = System.currentTimeMillis() / 1000
+        val dawnStart = days[0].dawn - 1800
+        val dawnEnd =  days[0].dawn + 1800
+
+        val duskStart = days[0].dusk - 1800
+        val duskEnd = days[0].dusk + 1800
+
+        println(currentTime)
+        println(dawnStart)
+        println(duskStart)
+
+        val background = when {
+            currentTime in dawnStart..dawnEnd -> R.drawable.sunrise_sunset_background
+            currentTime in duskStart..duskEnd -> R.drawable.sunrise_sunset_background
+            (currentTime > days[0].dusk) || (currentTime < days[0].dawn) -> R.drawable.night_background
+            else -> R.drawable.day_background
+        }
+
+        backgroundImageView.setImageDrawable(ContextCompat.getDrawable(this, background))
+
     }
 
     private fun onClick(index: Int) {
         val intent = Intent(this, DayActivity::class.java)
-        intent.putExtra("index", index+3)
+        intent.putExtra("index", index+1)
         startActivity(intent)
     }
 

@@ -4,7 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.MainActivity
@@ -16,14 +18,6 @@ class DaysListAdapter(private val context: Context, private val list: List<Day>,
     interface OnClickListener {
         fun onClick(day: Day, position: Int)
     }
-
-    //private val onClickListener: OnClickListener
-    //private val days: List<Day>
-
-    /*init {
-        this.days = list
-        this.onClickListener = onClickListener
-    }*/
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -37,7 +31,17 @@ class DaysListAdapter(private val context: Context, private val list: List<Day>,
         holder.temperatureView.text = day.mean_temperature.toString()
         holder.feelsLikeView.text = day.mean_feels_like.toString()
 
-        val hoursAdapter = HoursListAdapter(day.hours_list)
+        val weather = day.mean_weather
+        val weatherImage = when (weather) {
+            "Clear" -> R.drawable.clear
+            "Clouds" -> R.drawable.cloudy
+            "Rain" -> R.drawable.rain
+            "Thunderstorm" -> R.drawable.thunder
+            else -> null
+        }
+        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage!!))
+
+        val hoursAdapter = HoursListAdapter(context,day.hours_list)
         holder.hoursListView.layoutManager =  LinearLayoutManager(context,LinearLayoutManager.HORIZONTAL,false)
         holder.hoursListView.adapter = hoursAdapter
 
@@ -50,7 +54,7 @@ class DaysListAdapter(private val context: Context, private val list: List<Day>,
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        //val imageView: ImageView = itemView.findViewById(R.id.imageview)
+        val imageView: ImageView = itemView.findViewById(R.id.weather_icon)
         val dateView: TextView = itemView.findViewById(R.id.date)
         val temperatureView : TextView = itemView.findViewById(R.id.temperature)
         val feelsLikeView : TextView = itemView.findViewById(R.id.feels_like)
