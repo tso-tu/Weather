@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="city"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#555555"
+        android:paddingLeft="30dp"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25°"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#333333" />
+    <TextView
+        android:id="@+id/feels_like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25°"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+       />
+
+    <ImageView
+        android:id="@+id/weather"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|center_vertical"
+        android:src="@drawable/clear" />
+
+</LinearLayout>

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentWeatherView: TextView
     private lateinit var currentWeatherImageView: ImageView
     private lateinit var backgroundImageView: ImageView
+    private lateinit var citiesButton: Button
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
@@ -77,6 +79,12 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView!!.adapter = adapter
         recyclerView!!.setNestedScrollingEnabled(true)
+
+        citiesButton = findViewById(R.id.cities_button)
+        citiesButton.setOnClickListener {
+            val intent = Intent(this, CitiesActivity::class.java)
+            startActivity(intent)
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 

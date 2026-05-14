@@ -1,8 +1,10 @@
 package com.example.weather
 
 import ChartMarkerView
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -33,6 +35,7 @@ class DayActivity : AppCompatActivity() {
     private lateinit var precipitationView: TextView
     private lateinit var weatherImageView: ImageView
     private lateinit var backgroundImageView: ImageView
+    private lateinit var citiesButton: Button
 
     private lateinit var hoursChart: LineChart
 
@@ -77,6 +80,12 @@ class DayActivity : AppCompatActivity() {
         weatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage!!))
         backgroundImageView = findViewById(R.id.background) as ImageView
         setBackground(day.hours_list[0].hour, i)
+
+        citiesButton = findViewById(R.id.cities_button)
+        citiesButton.setOnClickListener {
+            val intent = Intent(this, CitiesActivity::class.java)
+            startActivity(intent)
+        }
 
         for (hour in day.hours_list){
             hours.add(hour.hour)
