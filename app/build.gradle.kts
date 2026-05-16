@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -51,4 +53,6 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    //implementation for json file
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }

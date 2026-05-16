@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -40,8 +41,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentWeatherImageView: ImageView
     private lateinit var backgroundImageView: ImageView
     private lateinit var citiesButton: Button
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private lateinit var cityOnToolbarView: TextView
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var adapter: DaysListAdapter? = null
     var recyclerView: RecyclerView? = null
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         val formater = SimpleDateFormat("d MMMM, EE", Locale("ru"))
         val currentDate = formater.format(Date())
-
+        println("opened")
         currentDateView = findViewById(R.id.current_date)
         currentDateView.text = currentDate
         currentTemperatureView = findViewById(R.id.current_temperature)
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         backgroundImageView = findViewById(R.id.background) as ImageView
         backgroundImageView.setOnClickListener {
             val intent = Intent(this, DayActivity::class.java)
-            startActivity(intent)
+            changeCityLauncher.launch(intent)
         }
 
 
@@ -83,8 +85,10 @@ class MainActivity : AppCompatActivity() {
         citiesButton = findViewById(R.id.cities_button)
         citiesButton.setOnClickListener {
             val intent = Intent(this, CitiesActivity::class.java)
-            startActivity(intent)
+            changeCityLauncher.launch(intent)
         }
+
+        cityOnToolbarView = findViewById(R.id.city)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -246,7 +250,7 @@ class MainActivity : AppCompatActivity() {
     private fun onClick(index: Int) {
         val intent = Intent(this, DayActivity::class.java)
         intent.putExtra("index", index+1)
-        startActivity(intent)
+        changeCityLauncher.launch(intent)
     }
 
     companion object {
@@ -254,4 +258,21 @@ class MainActivity : AppCompatActivity() {
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
         val days: MutableList<Day> = mutableListOf()
     }
+
+    private val changeCityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            val city = data?.getStringExtra("city") ?: return@registerForActivityResult
+            val latitude = data?.getDoubleExtra("latitude", 0.0) ?: return@registerForActivityResult
+            val longitude = data?.getDoubleExtra("longitude", 0.0) ?: return@registerForActivityResult
+
+            days.clear()
+            val weatherUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$API_KEY"
+            cityOnToolbarView.text = city
+            fetchWeatherData(weatherUrl)
+        }
+    }
+
 }

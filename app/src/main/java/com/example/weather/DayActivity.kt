@@ -8,10 +8,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.weather.MainActivity.Companion.API_KEY
 import com.example.weather.MainActivity.Companion.days
 import com.example.weather.dataclasses.Day
 import com.github.mikephil.charting.charts.LineChart
@@ -38,6 +40,8 @@ class DayActivity : AppCompatActivity() {
     private lateinit var citiesButton: Button
 
     private lateinit var hoursChart: LineChart
+
+    private lateinit var cityOnToolbarView: TextView
 
     private val hours: MutableList<String> = mutableListOf()
     private val temperatures: MutableList<Int> = mutableListOf()
@@ -84,8 +88,10 @@ class DayActivity : AppCompatActivity() {
         citiesButton = findViewById(R.id.cities_button)
         citiesButton.setOnClickListener {
             val intent = Intent(this, CitiesActivity::class.java)
-            startActivity(intent)
+            changeCityLauncher.launch(intent)
         }
+
+        cityOnToolbarView = findViewById(R.id.city)
 
         for (hour in day.hours_list){
             hours.add(hour.hour)
@@ -201,9 +207,9 @@ class DayActivity : AppCompatActivity() {
         hoursChart.setBackgroundColor(Color.LTGRAY)
         hoursChart.setNoDataText("Данных нет")
         hoursChart.invalidate()
-    }
+   }
 
-    private fun setBackground(hour:String, day_num: Int){
+    private fun setBackground(hour:String, day_num: Int) {
         val dawnStart = day.dawn - 5400 + day_num*86400
         val dawnEnd =  day.dawn + 5400 + day_num*86400
 
@@ -222,5 +228,27 @@ class DayActivity : AppCompatActivity() {
         }
 
         backgroundImageView.setImageDrawable(ContextCompat.getDrawable(this@DayActivity, background))
+    }
+
+    private val changeCityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            val city = data?.getStringExtra("city") ?: return@registerForActivityResult
+            val latitude = data?.getDoubleExtra("latitude", 0.0) ?: return@registerForActivityResult
+            val longitude = data?.getDoubleExtra("longitude", 0.0) ?: return@registerForActivityResult
+
+            if (latitude != 0.0 && longitude != 0.0) {
+                val intent = Intent().apply {
+                    putExtra("fromDayActivity", true)
+                    putExtra("city", city)
+                    putExtra("latitude", latitude)
+                    putExtra("longitude", longitude)
+                }
+                setResult(RESULT_OK, intent)
+                finish()
+            }
+        }
     }
 }

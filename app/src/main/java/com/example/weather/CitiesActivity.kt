@@ -24,9 +24,11 @@ import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.weather.MainActivity.Companion.API_KEY
 import com.example.weather.MainActivity.Companion.days
 import com.example.weather.adapters.DaysListAdapter
 import com.example.weather.adapters.SearchCitiesListAdapter
+import com.example.weather.dataclasses.CityJson
 import com.example.weather.dataclasses.Day
 import com.example.weather.dataclasses.Hour
 import org.json.JSONArray
@@ -35,6 +37,8 @@ import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 
 class CitiesActivity : AppCompatActivity() {
     private val cities: MutableList<City> = mutableListOf()
@@ -48,7 +52,6 @@ class CitiesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_cities)
 
-        setCitiesList()
         recyclerView = findViewById(R.id.cities)
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.setHasFixedSize(true)
@@ -59,7 +62,6 @@ class CitiesActivity : AppCompatActivity() {
             }
         })
         recyclerView!!.adapter = adapter
-
         setCitiesList()
 
         addButton = findViewById(R.id.add)
@@ -140,6 +142,7 @@ class CitiesActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             if (selected_city.isNotEmpty()) {
                 addSelectedCity(selected_city)
+                setCitiesList()
                 searchDialog.dismiss()
             } else {
                 Toast.makeText(this, "Пожалуйста, выберите город", Toast.LENGTH_SHORT).show()
@@ -149,19 +152,51 @@ class CitiesActivity : AppCompatActivity() {
     }
 
     private fun setCitiesList(){
+        val cities_from_json = loadJson()
+        val list = mutableListOf<City>()
+        for (city in cities_from_json){
+            val url = "https://api.openweathermap.org/data/2.5/weather?lat=${city.latitude}&lon=${city.longitude}&appid=$API_KEY&units=metric"
+            val queue = Volley.newRequestQueue(this)
 
+            val request = StringRequest(Request.Method.GET, url,
+                { response ->
+                    try {
+                        val jsonResponse = JSONObject(response)
+                        val temperature = jsonResponse.getJSONObject("main").getInt("temp")
+                        val feels_like = jsonResponse.getJSONObject("main").getInt("feels_like")
+                        val weather = jsonResponse.getJSONArray("weather").getJSONObject(0).getString("main")
+
+                        list.add(City(city.city, temperature, feels_like, weather))
+                        println(list)
+                        cities.clear()
+                        cities.addAll(list)
+                        adapter?.notifyDataSetChanged()
+                        println(list.size)
+                    } catch (error: Exception) {
+                        error.printStackTrace()
+                    }
+                },
+                { error ->
+                    error.printStackTrace()
+                })
+            queue.add(request)
+        }
     }
 
     private fun addSelectedCity(city: String){
-        val url = "https://nominatim.openstreetmap.org/search?q=$city&format=jsonv2"
+        val url = "https://api.openweathermap.org/geo/1.0/direct?q=$city&limit=1&appid=$API_KEY"
         val queue = Volley.newRequestQueue(this)
 
         val request = StringRequest(Request.Method.GET, url,
             { response ->
                 try {
                     val jsonResponse = JSONArray(response)
-                    val latitude = jsonResponse.getJSONObject(0).getJSONObject("lat")
-                    val longitude = jsonResponse.getJSONObject(0).getJSONObject("lon")
+                    val latitude = jsonResponse.getJSONObject(0).getDouble("lat")
+                    val longitude = jsonResponse.getJSONObject(0).getDouble("lon")
+
+                    val cities_json = loadJson()
+                    cities_json.add(CityJson(city, latitude, longitude))
+                    saveJson(cities_json)
 
                 } catch (error: Exception) {
                     error.printStackTrace()
@@ -174,9 +209,56 @@ class CitiesActivity : AppCompatActivity() {
         queue.add(request)
     }
 
+    private fun loadJson(): MutableList<CityJson> {
+        val file = File(filesDir,"added_cities.json")
+        if (!file.exists()){
+            file.createNewFile()
+        }
+        val jsonString = file.readText()
+        if (file.length() == 0L) {
+            return mutableListOf()
+        }
+        return Json.decodeFromString(jsonString)
+    }
+
+    private fun saveJson(cities: List<CityJson>) {
+        val file = File(filesDir,"added_cities.json")
+        if (!file.exists()){
+            file.createNewFile()
+        }
+        val jsonString = Json.encodeToString(cities)
+        file.writeText(jsonString)
+    }
+
     private fun onClick(city: City) {
-        //val intent = Intent(this, DayActivity::class.java)
-        //intent.putExtra("index",)
-        //startActivity(intent)
+        val url = "https://api.openweathermap.org/geo/1.0/direct?q=${city.city}&limit=1&appid=$API_KEY"
+        val queue = Volley.newRequestQueue(this)
+
+        val request = StringRequest(Request.Method.GET, url,
+            { response ->
+                try {
+                    val jsonResponse = JSONArray(response)
+                    val latitude = jsonResponse.getJSONObject(0).getDouble("lat")
+                    val longitude = jsonResponse.getJSONObject(0).getDouble("lon")
+                    val intent = Intent().apply {
+                        putExtra("city", city.city)
+                        putExtra("latitude", latitude)
+                        putExtra("longitude", longitude)
+                    }
+                    setResult(RESULT_OK, intent)
+                    finish()
+                } catch (error: Exception) {
+                    error.printStackTrace()
+                }
+            },
+            { error ->
+                error.printStackTrace()
+            })
+
+        queue.add(request)
+    }
+
+    companion object {
+        const val API_KEY = "8c195f5286cded5d2d2d91cf76330fbb"
     }
 }
