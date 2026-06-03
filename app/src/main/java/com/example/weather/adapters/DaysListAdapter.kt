@@ -9,9 +9,10 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weather.MainActivity
 import com.example.weather.R
 import com.example.weather.dataclasses.Day
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DaysListAdapter(private val context: Context, private val list: List<Day>, private val onClickListener : OnClickListener) : RecyclerView.Adapter<DaysListAdapter.ViewHolder>() {
 
@@ -27,26 +28,30 @@ class DaysListAdapter(private val context: Context, private val list: List<Day>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val day = list[position]
-        holder.dateView.text = day.date
-        holder.temperatureView.text = day.mean_temperature.toString()
-        holder.feelsLikeView.text = day.mean_feels_like.toString()
+        val inputDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val outputDateFormat = SimpleDateFormat("d MMMM, EE", Locale("ru"))
+        val date = outputDateFormat.format(inputDateFormat.parse(day.date))
+        holder.dateView.text = date
+        holder.temperatureView.text = "${day.meanTemperature}°"
+        holder.feelsLikeView.text = "${day.meanFeelsLike}°"
 
-        val weather = day.mean_weather
+        val weather = day.meanWeather
         val weatherImage = when (weather) {
             "Clear" -> R.drawable.clear
             "Clouds" -> R.drawable.cloudy
             "Rain" -> R.drawable.rain
             "Thunderstorm" -> R.drawable.thunder
-            else -> null
+            "Snow" -> R.drawable.rain
+            "Drizzle" -> R.drawable.rain
+            else -> R.drawable.cloudy
         }
-        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage!!))
+        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage))
 
-        val hoursAdapter = HoursListAdapter(context,day.hours_list)
+        val hoursAdapter = HoursListAdapter(context,day.hoursList)
         holder.hoursListView.layoutManager =  LinearLayoutManager(context,LinearLayoutManager.HORIZONTAL,false)
         holder.hoursListView.adapter = hoursAdapter
 
         holder.itemView.setOnClickListener{onClickListener.onClick(day, position)}
-
     }
 
     override fun getItemCount(): Int {

@@ -3,8 +3,9 @@ package com.example.weather
 import ChartMarkerView
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -13,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.weather.MainActivity.Companion.API_KEY
-import com.example.weather.MainActivity.Companion.days
 import com.example.weather.dataclasses.Day
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -37,7 +36,10 @@ class DayActivity : AppCompatActivity() {
     private lateinit var precipitationView: TextView
     private lateinit var weatherImageView: ImageView
     private lateinit var backgroundImageView: ImageView
-    private lateinit var citiesButton: Button
+    private lateinit var gradientImageView: ImageView
+    private lateinit var citiesButton: ImageButton
+    private lateinit var backButton: ImageButton
+    private lateinit var themeButton: ImageButton
 
     private lateinit var hoursChart: LineChart
 
@@ -55,35 +57,40 @@ class DayActivity : AppCompatActivity() {
         val i = intent.getIntExtra("index", 0)
         day= days[i]
 
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd")
-        val outputFormat = SimpleDateFormat("d MMMM, EE", Locale("ru"))
-        val date = outputFormat.format(inputFormat.parse(day.date))
-
+        val inputDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val outputDateFormat = SimpleDateFormat("d MMMM, EE", Locale("ru"))
+        val date = outputDateFormat.format(inputDateFormat.parse(day.date))
         dateView = findViewById(R.id.date)
         dateView.text = date
         temperatureView = findViewById(R.id.temperature)
-        temperatureView.text = day.hours_list[0].temperature.toString()
+        temperatureView.text = "${day.hoursList[0].temperature}°C"
         weatherView = findViewById(R.id.weather)
-        val weather = day.hours_list[0].weather
-        val feels_like = day.hours_list[0].feels_like
-        weatherView.text = "$weather, ощущается как $feels_like"
+        val weather = day.hoursList[0].weather
+        val feelsLike = day.hoursList[0].feelsLike
+        weatherView.text = "${translate(weather)}, ощущается как $feelsLike°"
         windView = findViewById(R.id.wind)
-        windView.text = day.hours_list[0].wind
+        windView.text = day.hoursList[0].wind
         humidityView = findViewById(R.id.humidity)
-        humidityView.text = day.hours_list[0].humidity.toString()
+        humidityView.text = day.hoursList[0].humidity.toString()
         precipitationView = findViewById(R.id.precipitation)
-        precipitationView.text = day.hours_list[0].precipitation.toString()
-        weatherImageView = findViewById(R.id.weather_img)
+        precipitationView.text = day.hoursList[0].precipitation.toString()
         val weatherImage = when (weather) {
-            "Clear" -> R.drawable.clear
-            "Clouds" -> R.drawable.cloudy
-            "Rain" -> R.drawable.rain
-            "Thunderstorm" -> R.drawable.thunder
-            else -> null
+            "Clear" -> R.drawable.clear_anim
+            "Clouds" -> R.drawable.cloudy_anim
+            "Rain" -> R.drawable.rain_anim
+            "Thunderstorm" -> R.drawable.thunder_anim
+            "Snow" -> R.drawable.rain_anim
+            "Drizzle" -> R.drawable.rain_anim
+            else -> R.drawable.cloudy_anim
         }
-        weatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage!!))
-        backgroundImageView = findViewById(R.id.background) as ImageView
-        setBackground(day.hours_list[0].hour, i)
+        //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
+        weatherImageView = findViewById(R.id.weather_img)
+        weatherImageView.setImageResource(weatherImage)
+        val animation = weatherImageView.drawable as AnimationDrawable
+        animation.start()
+        backgroundImageView = findViewById(R.id.background)
+        gradientImageView = findViewById(R.id.gradient)
+        setBackground(day.hoursList[0].hour, i)
 
         citiesButton = findViewById(R.id.cities_button)
         citiesButton.setOnClickListener {
@@ -92,17 +99,27 @@ class DayActivity : AppCompatActivity() {
         }
 
         cityOnToolbarView = findViewById(R.id.city)
+        cityOnToolbarView.text = MainActivity.city
 
-        for (hour in day.hours_list){
+        for (hour in day.hoursList){
             hours.add(hour.hour)
         }
-        for (hour in day.hours_list){
+        for (hour in day.hoursList){
             temperatures.add(hour.temperature)
         }
 
         hoursChart = findViewById(R.id.hoursChart)
         createChart(i)
 
+        backButton = findViewById(R.id.back_button)
+        backButton.setOnClickListener {
+            finish()
+        }
+
+        themeButton = findViewById(R.id.theme_button)
+        themeButton.setOnClickListener {
+            ThemeChanger.changeTheme(this)
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -111,123 +128,199 @@ class DayActivity : AppCompatActivity() {
         }
     }
 
-
-   private fun createChart(day_num: Int) {
+   private fun createChart(dayNum: Int) {
         val entries = mutableListOf<Entry>()
         for (i in temperatures.indices) {
             entries.add(Entry(i.toFloat(), temperatures[i].toFloat()))
         }
         val dataSet = LineDataSet(entries, "")
-        dataSet.apply {
-            color = Color.rgb(76, 175, 80)
-            lineWidth = 3f
-            setDrawCircles(false)
-            setDrawValues(false)
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-            setDrawCircleHole(false)
-            circleRadius = 4f
-        }
+       dataSet.apply {
+           color = ContextCompat.getColor(this@DayActivity, R.color.blue)
+           lineWidth = 5f
+           setDrawCircles(false)
+           setDrawValues(false)
+           mode = LineDataSet.Mode.CUBIC_BEZIER
+           setDrawCircleHole(false)
+           circleRadius = 6f
 
-        val lineData = LineData(dataSet)
-        hoursChart.apply {
-            data = lineData
-            description.isEnabled = false
-            setTouchEnabled(true)
-            setPinchZoom(false)
-            setScaleEnabled(false)
-            isDragEnabled = true
-            setDrawGridBackground(false)
+           setDrawHighlightIndicators(false)
+       }
 
-            axisLeft.isEnabled = false
-            axisRight.isEnabled = false
+       val lineData = LineData(dataSet)
+       hoursChart.apply {
+           data = lineData
+           description.isEnabled = false
+           setTouchEnabled(true)
+           setPinchZoom(false)
+           setScaleEnabled(false)
+           isDragEnabled = true
+           setDrawGridBackground(false)
 
-            xAxis.apply {
-                setDrawGridLines(true)
-                gridColor = Color.LTGRAY
-                position = XAxis.XAxisPosition.BOTTOM
-                valueFormatter = IndexAxisValueFormatter(hours)
-                granularity = 1f
-                setLabelCount(hours.size, true)
-                setAvoidFirstLastClipping(true)
-                textSize = 20f
-                textColor = Color.BLACK
-                axisLineColor = Color.GRAY
-                axisLineWidth = 1f
-            }
+           setVisibleXRangeMaximum(4f)
+           isDragDecelerationEnabled = true
 
-            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry?, h: Highlight?) {
-                    if (e != null) {
-                        val i = e.x.toInt()
-                        val selectedHour = day.hours_list[i]
+           legend.isEnabled = false
 
-                        temperatureView.text = selectedHour.temperature.toString()
+           axisLeft.isEnabled = false
+           axisRight.isEnabled = false
 
-                        val weather = selectedHour.weather
-                        val feels_like = selectedHour.feels_like
-                        weatherView.text = "$weather, ощущается как $feels_like"
+           xAxis.apply {
+               setDrawGridLines(true)
+               gridColor = Color.LTGRAY
+               position = XAxis.XAxisPosition.BOTTOM
+               valueFormatter = IndexAxisValueFormatter(hours)
 
-                        windView.text = selectedHour.wind
-                        humidityView.text = selectedHour.humidity.toString()
-                        precipitationView.text = selectedHour.precipitation.toString()
-                        val weatherImage = when (weather) {
-                            "Clear" -> R.drawable.clear
-                            "Clouds" -> R.drawable.cloudy
-                            "Rain" -> R.drawable.rain
-                            "Thunderstorm" -> R.drawable.thunder
-                            else -> null
-                        }
-                        weatherImageView.setImageDrawable(ContextCompat.getDrawable(this@DayActivity, weatherImage!!))
-                        setBackground(selectedHour.hour, day_num)
-                    }
-                }
+               setLabelCount(hours.size, false)
+               granularity = 1f
+               isGranularityEnabled = true
+               setAvoidFirstLastClipping(true)
+               setDrawLabels(true)
+               textSize = 16f
 
-                override fun onNothingSelected() {
-                    val firstHour = day.hours_list[0]
-                    temperatureView.text = firstHour.temperature.toString()
-                    val weather = firstHour.weather
-                    val feels_like = firstHour.feels_like
-                    weatherView.text = "$weather, ощущается как $feels_like"
-                    windView.text = firstHour.wind
-                    humidityView.text = firstHour.humidity.toString()
-                    precipitationView.text = firstHour.precipitation.toString()
-                    val weatherImage = when (weather) {
-                        "Clear" -> R.drawable.clear
-                        "Clouds" -> R.drawable.cloudy
-                        "Rain" -> R.drawable.rain
-                        "Thunderstorm" -> R.drawable.thunder
-                        else -> null
-                    }
-                    weatherImageView.setImageDrawable(ContextCompat.getDrawable(this@DayActivity, weatherImage!!))
-                    setBackground(firstHour.hour, day_num)
-                }
-            })
-        }
-        hoursChart.marker = ChartMarkerView(this)
-        hoursChart.setBackgroundColor(Color.LTGRAY)
-        hoursChart.setNoDataText("Данных нет")
-        hoursChart.invalidate()
+               textColor = ContextCompat.getColor(context, R.color.grey)
+               labelRotationAngle = 0f
+
+               axisMinimum = -0.5f
+               axisMaximum = (hours.size - 1).toFloat() + 0.5f
+
+               axisLineColor = Color.GRAY
+               axisLineWidth = 1f
+               setDrawAxisLine(false)
+               setCenterAxisLabels(false)
+           }
+
+           xAxis.setDrawGridLines(false)
+
+           axisLeft.apply {
+               isEnabled = true
+               setDrawGridLines(true)
+               setDrawAxisLine(false)
+               setDrawLabels(false)
+
+               axisMaximum = 40f
+
+               enableGridDashedLine(10f, 10f, 0f)
+               gridColor = Color.rgb(180, 180, 180)
+               gridLineWidth = 1f
+           }
+           axisRight.isEnabled = false
+
+           setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+               override fun onValueSelected(e: Entry?, h: Highlight?) {
+                   if (e != null) {
+                       val i = e.x.toInt()
+                       if (i in day.hoursList.indices) {
+                           val selectedHour = day.hoursList[i]
+
+                           temperatureView.text = "${selectedHour.temperature}°C"
+
+                           val weather = selectedHour.weather
+                           val feelsLike = selectedHour.feelsLike
+                           weatherView.text = "${translate(weather)}, ощущается как $feelsLike°"
+
+                           windView.text = selectedHour.wind
+                           humidityView.text = selectedHour.humidity.toString()
+                           precipitationView.text = selectedHour.precipitation.toString()
+                           val weatherImage = when (weather) {
+                               "Clear" -> R.drawable.clear_anim
+                               "Clouds" -> R.drawable.cloudy_anim
+                               "Rain" -> R.drawable.rain_anim
+                               "Thunderstorm" -> R.drawable.thunder_anim
+                               "Snow" -> R.drawable.rain_anim
+                               "Drizzle" -> R.drawable.rain_anim
+                               else -> R.drawable.cloudy_anim
+                           }
+                           //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
+                           weatherImageView.setImageResource(weatherImage)
+                           val animation = weatherImageView.drawable as AnimationDrawable
+                           animation.start()
+                           setBackground(selectedHour.hour, dayNum)
+                       }
+                   }
+               }
+
+               override fun onNothingSelected() {
+                   val firstHour = day.hoursList[0]
+                   temperatureView.text = "${firstHour.temperature}°C"
+                   val weather = firstHour.weather
+                   val feelsLike = firstHour.feelsLike
+                   weatherView.text = "${translate(weather)}, ощущается как $feelsLike°"
+                   windView.text = firstHour.wind
+                   humidityView.text = firstHour.humidity.toString()
+                   precipitationView.text = firstHour.precipitation.toString()
+                   val weatherImage = when (weather) {
+                       "Clear" -> R.drawable.clear_anim
+                       "Clouds" -> R.drawable.cloudy_anim
+                       "Rain" -> R.drawable.rain_anim
+                       "Thunderstorm" -> R.drawable.thunder_anim
+                       "Snow" -> R.drawable.rain_anim
+                       "Drizzle" -> R.drawable.rain_anim
+                       else -> R.drawable.cloudy_anim
+                   }
+                   //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
+                   weatherImageView.setImageResource(weatherImage)
+                   val animation = weatherImageView.drawable as AnimationDrawable
+                   animation.start()
+                   setBackground(firstHour.hour, dayNum)
+               }
+           })
+           marker = ChartMarkerView(this@DayActivity)
+           setNoDataText("Данных нет")
+           extraBottomOffset = 20f
+           invalidate()
+       }
    }
 
-    private fun setBackground(hour:String, day_num: Int) {
-        val dawnStart = day.dawn - 5400 + day_num*86400
-        val dawnEnd =  day.dawn + 5400 + day_num*86400
+    private fun setBackground(hour:String, dayNum: Int) {
+        val dawnStart = day.dawn - 5400 + dayNum*86400
+        val dawnEnd =  day.dawn + 5400 + dayNum*86400
 
-        val duskStart = day.dusk - 5400 + day_num*86400
-        val duskEnd = day.dusk + 5400 + day_num*86400
+        val duskStart = day.dusk - 5400 + dayNum*86400
+        val duskEnd = day.dusk + 5400 + dayNum*86400
 
-        val dateTimeString = "${day.date} ${hour}"
-        val format = SimpleDateFormat("yyyy-MM-dd HH:mm")
-        val time = format.parse(dateTimeString).time.div(1000)
-
+        println(dawnStart)
+        println(duskStart)
+        val dateTimeString = "${day.date} $hour"
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale("ru"))
+        val time = format.parse(dateTimeString)!!.time / 1000
+        println(time)
         val background = when {
             time in dawnStart..dawnEnd -> R.drawable.sunrise_sunset_background
             time in duskStart..duskEnd -> R.drawable.sunrise_sunset_background
-            (time > day.dusk + day_num*86400) || (time < day.dawn + day_num*86400) -> R.drawable.night_background
+            (time > duskEnd) || (time < dawnStart) -> R.drawable.night_background
             else -> R.drawable.day_background
         }
-
         backgroundImageView.setImageDrawable(ContextCompat.getDrawable(this@DayActivity, background))
+
+        val gradient = when {
+            time in dawnStart..dawnEnd -> R.drawable.sunrise_sunset_gradient2
+            time in duskStart..duskEnd -> R.drawable.sunrise_sunset_gradient2
+            (time > day.dusk + dayNum*86400) || (time < day.dawn + dayNum*86400) -> R.drawable.night_gradient2
+            else -> R.drawable.day_gradient2
+        }
+
+        gradientImageView.setImageDrawable(ContextCompat.getDrawable(this@DayActivity, gradient))
+    }
+
+    private fun translate(weather: String): String {
+        return when (weather) {
+            "Clear" -> "Ясно"
+            "Clouds" -> "Облачно"
+            "Rain" -> "Дождь"
+            "Thunderstorm" -> "Гроза"
+            "Snow" -> "Снег"
+            "Drizzle" -> "Морось"
+            "Mist" -> "Туман"
+            "Smoke" -> "Дымка"
+            "Haze" -> "Мгла"
+            "Dust" -> "Пыль"
+            "Fog" -> "Туман"
+            "Sand" -> "Песок"
+            "Ash" -> "Пепел"
+            "Squall" -> "Шквал"
+            "Tornado" -> "Торнадо"
+            else -> weather
+        }
     }
 
     private val changeCityLauncher = registerForActivityResult(
@@ -236,8 +329,8 @@ class DayActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             val data = result.data
             val city = data?.getStringExtra("city") ?: return@registerForActivityResult
-            val latitude = data?.getDoubleExtra("latitude", 0.0) ?: return@registerForActivityResult
-            val longitude = data?.getDoubleExtra("longitude", 0.0) ?: return@registerForActivityResult
+            val latitude = data.getDoubleExtra("latitude", 0.0)
+            val longitude = data.getDoubleExtra("longitude", 0.0)
 
             if (latitude != 0.0 && longitude != 0.0) {
                 val intent = Intent().apply {

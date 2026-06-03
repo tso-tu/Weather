@@ -55,4 +55,10 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     //implementation for json file
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    //implementation for map
+    implementation("org.maplibre.gl:android-sdk:11.7.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

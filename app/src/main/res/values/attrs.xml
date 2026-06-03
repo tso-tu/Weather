@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="dayBackground" format="color" />
+    <attr name="hourBackground" format="color" />
+    <attr name="dividerColor" format="color" />
+    <attr name="secondaryTextColor" format="color" />
+    <attr name="iconColor" format="color" />
+    <attr name="markerColor" format="color" />
+</resources>

@@ -7,12 +7,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weather.MainActivity
 import com.example.weather.R
 import com.example.weather.dataclasses.City
-import com.example.weather.dataclasses.Day
 
 class CitiesListAdapter(private val context: Context, private val list: List<City>, private val onClickListener : OnClickListener) : RecyclerView.Adapter<CitiesListAdapter.ViewHolder>() {
 
@@ -29,8 +26,8 @@ class CitiesListAdapter(private val context: Context, private val list: List<Cit
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val city = list[position]
         holder.cityView.text = city.city
-        holder.temperatureView.text = city.temperature.toString()
-        holder.feelsLikeView.text = city.feels_like.toString()
+        holder.temperatureView.text = "${city.temperature}°"
+        holder.feelsLikeView.text = "${city.feelsLike}°"
 
         val weather = city.weather
         val weatherImage = when (weather) {
@@ -38,11 +35,12 @@ class CitiesListAdapter(private val context: Context, private val list: List<Cit
             "Clouds" -> R.drawable.cloudy
             "Rain" -> R.drawable.rain
             "Thunderstorm" -> R.drawable.thunder
-            else -> null
+            "Snow" -> R.drawable.rain
+            "Drizzle" -> R.drawable.rain
+            else -> R.drawable.cloudy
         }
-        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage!!))
-        holder.itemView.setOnClickListener{onClickListener.onClick(city, position)}
-
+        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage))
+        holder.itemView.setOnClickListener { onClickListener.onClick(city, position) }
     }
 
     override fun getItemCount(): Int {
@@ -50,7 +48,6 @@ class CitiesListAdapter(private val context: Context, private val list: List<Cit
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
         val cityView: TextView = itemView.findViewById(R.id.city)
         val temperatureView : TextView = itemView.findViewById(R.id.temperature)
         val feelsLikeView : TextView = itemView.findViewById(R.id.feels_like)

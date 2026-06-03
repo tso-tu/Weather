@@ -15,23 +15,24 @@ class HoursListAdapter(private val context: Context, private val list: List<Hour
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.hours_element, parent, false)
-
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val hour = list[position]
         holder.hourView.text = hour.hour
-        holder.temperatureView.text = hour.temperature.toString()
+        holder.temperatureView.text = "${hour.temperature}°"
         val weather = hour.weather
         val weatherImage = when (weather) {
             "Clear" -> R.drawable.clear
             "Clouds" -> R.drawable.cloudy
             "Rain" -> R.drawable.rain
             "Thunderstorm" -> R.drawable.thunder
-            else -> null
+            "Snow" -> R.drawable.rain
+            "Drizzle" -> R.drawable.rain
+            else -> R.drawable.cloudy
         }
-        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage!!))
+        holder.imageView.setImageDrawable(ContextCompat.getDrawable(context, weatherImage))
     }
 
     override fun getItemCount(): Int {

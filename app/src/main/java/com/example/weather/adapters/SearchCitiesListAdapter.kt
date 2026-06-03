@@ -1,18 +1,11 @@
 package com.example.weather.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weather.MainActivity
 import com.example.weather.R
-import com.example.weather.dataclasses.City
-import com.example.weather.dataclasses.Day
 
 class SearchCitiesListAdapter(private val list: List<String>, private val onClickListener : OnClickListener) : RecyclerView.Adapter<SearchCitiesListAdapter.ViewHolder>() {
 
@@ -29,7 +22,6 @@ class SearchCitiesListAdapter(private val list: List<String>, private val onClic
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.cityView.text = list[position]
         holder.itemView.setOnClickListener{onClickListener.onClick(list[position], position)}
-
     }
 
     override fun getItemCount(): Int {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android" android:oneshot="false">
+    <item android:drawable="@drawable/clear_00" android:duration="50" />
+    <item android:drawable="@drawable/clear_01" android:duration="50" />
+    <item android:drawable="@drawable/clear_02" android:duration="50" />
+    <item android:drawable="@drawable/clear_03" android:duration="50" />
+    <item android:drawable="@drawable/clear_04" android:duration="50" />
+    <item android:drawable="@drawable/clear_05" android:duration="50" />
+    <item android:drawable="@drawable/clear_06" android:duration="50" />
+    <item android:drawable="@drawable/clear_07" android:duration="50" />
+    <item android:drawable="@drawable/clear_08" android:duration="50" />
+    <item android:drawable="@drawable/clear_09" android:duration="50" />
+    <item android:drawable="@drawable/clear_10" android:duration="50" />
+    <item android:drawable="@drawable/clear_11" android:duration="50" />
+    <item android:drawable="@drawable/clear_12" android:duration="50" />
+    <item android:drawable="@drawable/clear_13" android:duration="50" />
+    <item android:drawable="@drawable/clear_14" android:duration="50" />
+    <item android:drawable="@drawable/clear_15" android:duration="50" />
+    <item android:drawable="@drawable/clear_16" android:duration="50" />
+    <item android:drawable="@drawable/clear_17" android:duration="50" />
+    <item android:drawable="@drawable/clear_18" android:duration="50" />
+    <item android:drawable="@drawable/clear_19" android:duration="50" />
+    <item android:drawable="@drawable/clear_20" android:duration="50" />
+    <item android:drawable="@drawable/clear_21" android:duration="50" />
+    <item android:drawable="@drawable/clear_22" android:duration="50" />
+    <item android:drawable="@drawable/clear_23" android:duration="50" />
+    <item android:drawable="@drawable/clear_24" android:duration="50" />
+    <item android:drawable="@drawable/clear_25" android:duration="50" />
+    <item android:drawable="@drawable/clear_26" android:duration="50" />
+    <item android:drawable="@drawable/clear_27" android:duration="50" />
+    <item android:drawable="@drawable/clear_28" android:duration="50" />
+    <item android:drawable="@drawable/clear_29" android:duration="50" />
+</animation-list>
