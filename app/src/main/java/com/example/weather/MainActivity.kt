@@ -190,8 +190,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchWeatherData(url: String) {
+        days.clear()
         val queue = Volley.newRequestQueue(this)
-
         val request = StringRequest(Request.Method.GET, url,
             { response ->
                 try {
@@ -318,7 +318,6 @@ class MainActivity : AppCompatActivity() {
             "Drizzle" -> R.drawable.rain_anim
             else -> R.drawable.cloudy_anim
         }
-        //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
         currentWeatherImageView.setImageResource(weatherImage)
         val animation = currentWeatherImageView.drawable as AnimationDrawable
         animation.start()

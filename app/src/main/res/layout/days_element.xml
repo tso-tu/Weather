@@ -35,6 +35,8 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:text="12 мая, пт"
+                    android:fontFamily="@font/manrope"
+                    android:textStyle="bold"
                     />
 
             </LinearLayout>
@@ -51,8 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="25°"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/feels_like"
@@ -60,7 +61,6 @@
                     android:layout_height="wrap_content"
                     android:text="23°"
                     android:textSize="18sp"
-                    android:textStyle="bold"
                     android:textColor="?attr/secondaryTextColor"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="8dp" />

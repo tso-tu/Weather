@@ -102,48 +102,4 @@ class MapMarkerView(private val context: Context) {
             }
         }
     }
-
-   /* fun setupMarkerClickHandler(map: MapLibreMap) {
-        map.addOnMapClickListener { latLng ->
-            var clickedMarker: CityMarker? = null
-            var minDistance = 100.0
-
-            addedMarkers.values.forEach { marker ->
-                val markerLatLng = LatLng(marker.latitude, marker.longitude)
-                val distance = calculateDistance(latLng, markerLatLng)
-
-                if (distance < 50 && distance < minDistance) {
-                    minDistance = distance
-                    clickedMarker = marker
-                }
-            }
-
-            clickedMarker?.let {
-                onMarkerClickListener?.invoke(it)
-                return@addOnMapClickListener true
-            }
-
-            false
-        }
-    }
-
-    private fun calculateDistance(point1: LatLng, point2: LatLng): Double {
-        val R = 6371000.0
-
-        val lat1 = Math.toRadians(point1.latitude)
-        val lon1 = Math.toRadians(point1.longitude)
-        val lat2 = Math.toRadians(point2.latitude)
-        val lon2 = Math.toRadians(point2.longitude)
-
-        val dlat = lat2 - lat1
-        val dlon = lon2 - lon1
-
-        val a = Math.sin(dlat / 2).pow(2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon / 2).pow(2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-        return R * c
-    }
-
-    private fun Double.pow(exp: Int): Double = Math.pow(this, exp.toDouble())
-*/
 }

@@ -20,6 +20,6 @@
     <item name="iconColor">@color/white</item>
     <item name="markerColor">@color/dark_grey</item>
 
-    <item name="android:fontFamily">@font/manrope</item>
+    <item name="android:fontFamily">@font/manrope_bold</item>
 </style>
 </resources>

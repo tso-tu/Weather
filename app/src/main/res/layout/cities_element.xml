@@ -20,6 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Город"
+            android:fontFamily="@font/manrope"
+            android:textStyle="bold"
             android:textSize="18sp"
             android:layout_gravity="center_vertical"/>
 
@@ -30,7 +32,6 @@
             android:layout_marginEnd="4dp"
             android:text="25°"
             android:textSize="18sp"
-            android:textStyle="bold"
             android:layout_gravity="end|center_vertical"/>
 
         <TextView
@@ -41,7 +42,6 @@
             android:text="25°"
             android:textSize="18sp"
             android:textColor="?attr/secondaryTextColor"
-            android:textStyle="bold"
             android:layout_gravity="end|center_vertical"/>
 
         <ImageView

@@ -83,7 +83,6 @@ class DayActivity : AppCompatActivity() {
             "Drizzle" -> R.drawable.rain_anim
             else -> R.drawable.cloudy_anim
         }
-        //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
         weatherImageView = findViewById(R.id.weather_img)
         weatherImageView.setImageResource(weatherImage)
         val animation = weatherImageView.drawable as AnimationDrawable
@@ -180,8 +179,8 @@ class DayActivity : AppCompatActivity() {
                textColor = ContextCompat.getColor(context, R.color.grey)
                labelRotationAngle = 0f
 
-               axisMinimum = -0.5f
-               axisMaximum = (hours.size - 1).toFloat() + 0.5f
+               axisMinimum = -0.1f
+               axisMaximum = (hours.size - 1).toFloat() + 0.1f
 
                axisLineColor = Color.GRAY
                axisLineWidth = 1f
@@ -197,7 +196,7 @@ class DayActivity : AppCompatActivity() {
                setDrawAxisLine(false)
                setDrawLabels(false)
 
-               axisMaximum = 40f
+               axisMaximum = (temperatures.maxOrNull()?.toFloat() ?: 10f) + 10f
 
                enableGridDashedLine(10f, 10f, 0f)
                gridColor = Color.rgb(180, 180, 180)
@@ -230,7 +229,6 @@ class DayActivity : AppCompatActivity() {
                                "Drizzle" -> R.drawable.rain_anim
                                else -> R.drawable.cloudy_anim
                            }
-                           //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
                            weatherImageView.setImageResource(weatherImage)
                            val animation = weatherImageView.drawable as AnimationDrawable
                            animation.start()
@@ -257,7 +255,6 @@ class DayActivity : AppCompatActivity() {
                        "Drizzle" -> R.drawable.rain_anim
                        else -> R.drawable.cloudy_anim
                    }
-                   //currentWeatherImageView.setImageDrawable(ContextCompat.getDrawable(this, weatherImage))
                    weatherImageView.setImageResource(weatherImage)
                    val animation = weatherImageView.drawable as AnimationDrawable
                    animation.start()

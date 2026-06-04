@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:text="Город"
+        android:fontFamily="@font/manrope"
+        android:textStyle="bold"
         android:paddingEnd="8dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"

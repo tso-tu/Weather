@@ -50,7 +50,6 @@
                     android:maxLength="20"
                     android:textSize="20sp"
                     android:textColor="@color/black"
-                    android:textStyle="bold"
                     android:paddingEnd="8dp"
                     android:gravity="center"
                     app:layout_constraintTop_toTopOf="parent"
@@ -64,12 +63,11 @@
     <Button
         android:id="@+id/my_geo"
         android:text="По моей геолокации"
-        android:layout_width="220dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_gravity="bottom|center_horizontal"
         android:textColor="@color/white"
         android:textSize="16sp"
-        android:textStyle="bold"
         app:backgroundTint="@color/blue"
         android:background="@drawable/corners12"
         android:layout_marginBottom="30dp" />

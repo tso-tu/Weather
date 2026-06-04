@@ -47,7 +47,6 @@
                     android:ellipsize="end"
                     android:maxLength="15"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -130,6 +129,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="Сегодня, 12 августа, чт"
+                        android:fontFamily="@font/manrope"
+                        android:textStyle="bold"
                         android:textColor="@color/white"
                         android:textSize="14sp"/>
 
@@ -159,6 +160,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="Ясно, ощущается как 32°"
+                        android:fontFamily="@font/manrope"
+                        android:textStyle="bold"
                         android:textColor="@color/white"
                         android:textSize="14sp"/>
 
@@ -168,8 +171,6 @@
                         android:orientation="horizontal"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginEnd="30dp"
                         android:layout_marginTop="30dp"
                         android:textSize="14sp"
                         >
@@ -184,6 +185,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Ветер"
+                                android:fontFamily="@font/manrope"
+                                android:textStyle="bold"
                                 android:textSize="16sp"
                                 android:textColor="@color/white"/>
 
@@ -197,7 +200,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="32sp"
-                                    android:textStyle="bold"
                                     android:text="5"
                                     android:textColor="@color/white"/>
 
@@ -205,7 +207,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="16sp"
-                                    android:textStyle="bold"
                                     android:text=" м/с"
                                     android:textColor="@color/white"/>
                             </LinearLayout>
@@ -226,6 +227,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_horizontal"
                                 android:text="Влажность"
+                                android:fontFamily="@font/manrope"
+                                android:textStyle="bold"
                                 android:textSize="16sp"
                                 android:textColor="@color/white"/>
 
@@ -239,7 +242,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="32sp"
-                                    android:textStyle="bold"
                                     android:text="28"
                                     android:textColor="@color/white"/>
 
@@ -247,7 +249,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="16sp"
-                                    android:textStyle="bold"
                                     android:text="%"
                                     android:textColor="@color/white"/>
                             </LinearLayout>
@@ -265,6 +266,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Осадки"
+                                android:fontFamily="@font/manrope"
+                                android:textStyle="bold"
                                 android:textSize="16sp"
                                 android:textColor="@color/white"/>
 
@@ -278,7 +281,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="32sp"
-                                    android:textStyle="bold"
                                     android:text="15"
                                     android:textColor="@color/white"/>
 
@@ -286,7 +288,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="16sp"
-                                    android:textStyle="bold"
                                     android:text=" мм"
                                     android:textColor="@color/white"/>
                             </LinearLayout>
@@ -301,7 +302,8 @@
                 android:id="@+id/hoursChart"
                 android:layout_below="@id/frame_layout"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
+                android:minHeight="230dp"
                 android:background="@drawable/corners12"
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="20dp"

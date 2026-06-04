@@ -1,8 +1,12 @@
 package com.example.weather
 
 import CityMarker
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Location
+import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.text.format.Formatter
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -11,6 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.example.weather.MainActivity.Companion.API_KEY
+import com.example.weather.MainActivity.Companion.city
+import com.example.weather.MainActivity.Companion.latitude
+import com.example.weather.MainActivity.Companion.longitude
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.maplibre.android.MapLibre
@@ -23,6 +34,8 @@ import org.maplibre.android.maps.OnMapReadyCallback
 import org.maplibre.android.maps.Style
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONArray
+import org.json.JSONException
 import java.io.InputStream
 import java.util.concurrent.Semaphore
 import kotlin.math.abs
@@ -35,16 +48,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var myGeoButton: Button
     private lateinit var mapView: MapView
 
+    private var currentLatitude = latitude
+    private var currentLongitude = longitude
     private lateinit var maplibreMap: MapLibreMap
     private var isMapReady = false
 
     private lateinit var mapMarkerView: MapMarkerView
     private val citiesList = mutableListOf<CityMarker>()
-    private var currentLatitude = 0.0
-    private var currentLongitude = 0.0
     private val cache = mutableMapOf<String, UpdatedWeatherData>()
     private val loadingCities = mutableSetOf<String>()
-    private var updateJob: Job? = null
     private var currentVisibleBounds: LatLngBounds? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,16 +68,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapMarkerView = MapMarkerView(this)
         cityView = findViewById(R.id.city)
 
-        cityView.text = MainActivity.city
-        currentLatitude = MainActivity.latitude
-        currentLongitude = MainActivity.longitude
+        cityView.text = city
 
         myGeoButton = findViewById(R.id.my_geo)
         myGeoButton.setOnClickListener {
             maplibreMap.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(currentLatitude, currentLongitude),
-                    5.0
+                    10.0
                 )
             )
         }
@@ -136,7 +146,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: MapLibreMap) {
         maplibreMap = map
-        maplibreMap.setMinZoomPreference(5.0)
+        maplibreMap.setMinZoomPreference(9.0)
         maplibreMap.setMaxZoomPreference(12.0)
         maplibreMap.setStyle(
             Style.Builder().fromUri("https://api.maptiler.com/maps/basic-v2/style.json?key=nTSEuIP0S43AeEqVPaZy")
@@ -144,8 +154,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             isMapReady = true
             maplibreMap.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                    LatLng(currentLatitude, currentLongitude),
-                    5.0
+                    LatLng(latitude, longitude),
+                    10.0
                 )
             )
             maplibreMap.addOnCameraIdleListener {
@@ -352,7 +362,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStop() {
         super.onStop()
         mapView.onStop()
-        updateJob?.cancel()
     }
 
     override fun onLowMemory() {
@@ -363,7 +372,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
-        updateJob?.cancel()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

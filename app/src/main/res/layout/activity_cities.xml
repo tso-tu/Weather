@@ -42,7 +42,6 @@
                     android:layout_height="wrap_content"
                     android:text="Мои города"
                     android:textSize="20sp"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -131,7 +130,6 @@
                 android:text="Добавить город"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:textStyle="bold"
                 app:backgroundTint="@color/blue" />
 
             <ImageButton
